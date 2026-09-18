@@ -127,7 +127,6 @@ Na consola, escolhe **Login as Editor** ou **Login as Player**. Como Jogador, po
 
 A documentação completa do projecto encontra-se em [`docsFinais/`](docsFinais/):
 
-- [Descrição detalhada do projecto](docsFinais/pi2-railway-logistics-simulator.md)
 - [Glossário](docsFinais/global-artifacts/01.requirements-engineering/glossary.md)
 - [Diagrama de casos de uso](docsFinais/global-artifacts/01.requirements-engineering/use-case-diagram.md)
 - [Especificação suplementar (FURPS+)](docsFinais/global-artifacts/01.requirements-engineering/supplementary-specification.md)
