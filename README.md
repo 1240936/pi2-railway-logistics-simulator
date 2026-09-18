@@ -64,7 +64,7 @@ A aplicação simula a exploração de uma rede ferroviária num contexto de ges
 ### 1. Clonar o repositório
 
 ```bash
-git clone https://github.com/<teu-utilizador>/pi2-railway-logistics-simulator.git
+git clone https://github.com/1240936/pi2-railway-logistics-simulator.git
 cd pi2-railway-logistics-simulator
 ```
 
