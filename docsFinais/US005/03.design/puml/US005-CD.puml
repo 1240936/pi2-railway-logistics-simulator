@@ -1,0 +1,161 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+'skinparam linetype orto
+
+skinparam classAttributeIconSize 0
+
+class BuildStationUI
+
+class BuildStationController {
+    + BuildStationController()
+    + getAvailableScenarioNames()
+    + getAvailableStationTypeNames()
+    + getRecommendedName(x, y, scenarioIdx, typeIdx)
+    + createStation(dto)
+}
+
+class Scenario {
+    - map: Map
+    - year: int
+    - locomotiveTypes: List<LocomotiveType>
+    - importation: List<ResourceType>
+    - exportation: List<ResourceType>
+    - changer: int
+    + getClosestCity(x, y)
+    + addStation(station)
+}
+
+class City {
+    -name: String
+    -position: Position
+    -cityBlocks: List <CityBlock>
+    + getName()
+}
+
+class Station {
+    -name: String
+    -center: StationCenter
+    -position: Position
+    -stationType: StationType
+    -demandedCargo: List<Cargo>
+    -suppliedCargo: List<Cargo>
+    + checkPosition(position, map)
+    + checkStationType(stationType)
+    + checkOverbuilding(position, map, scenario)
+    + checkCenter(center)
+}
+
+class Position {
+    -xCoordinate: int
+    -yCoordinate: int
+}
+
+class Player {
+    - username: String
+    - password: String
+    - budget: int
+    + deductBudget(stationType)
+}
+
+class ScenarioRepository {
+    + getScenarios()
+}
+
+class StationTypeRepository {
+    + getStationTypes()
+}
+class StationRepository {
+    + createStation(dto)
+    + addStation(station)
+}
+
+class ScenarioListMapper {
+    + toDTO(List<Scenario>)
+}
+
+class StationTypeListMapper {
+    + toDTO(List<StationType>)
+}
+
+class StationMapper {
+    + toStation(dto)
+}
+
+class ScenarioDTO{
+    -map: Map
+    -year: int
+    -locomotiveTypes: List<LocomotiveType>
+    -importation: List<ResourceType>
+    -exportation: List<ResourceType>
+    -changer: int
+}
+
+class StationTypeDTO{
+}
+
+class StationDTO {
+    - stationType: StationType
+    - xCoordinate: int
+    - yCoordinate: int
+    - name: String
+    - center: StationCenter
+    - demandedCargo: List<Cargo>
+    - suppliedCargo: List<Cargo>
+    - scenarioIndex: int
+    - stationTypeIndex: int
+    - map: Map
+    - scenario: Scenario
+}
+
+enum StationType{
+    STATION
+    DEPOT
+    TERMINAL
+    --
+    -cost: int
+    -radius: int
+}
+
+class Repositories {
+  -Repositories()
+  +getInstance()
+  +getScenarioRepository()
+  +getCityBlockRepository()
+  +getCityRepository()
+}
+
+BuildStationUI ..> BuildStationController
+
+BuildStationController..> Repositories
+
+Repositories -> "1" Repositories : instance
+Repositories --> "1" ScenarioRepository: scenarioRepository
+Repositories --> "1" StationTypeRepository: stationTypeRepository
+Repositories --> "1" StationRepository: stationRepository
+
+BuildStationController ..> ScenarioListMapper
+BuildStationController ..> StationTypeListMapper
+BuildStationController ..> StationMapper
+BuildStationController ..> Player
+BuildStationController ..> ScenarioRepository
+BuildStationController ..> StationRepository
+BuildStationController ..> StationTypeRepository
+
+ScenarioRepository --> "1..*" Scenario: scenario
+StationTypeRepository --> "3" StationType: stationType
+StationRepository --> "*" Station: station
+
+ScenarioListMapper --> "1" ScenarioDTO: scenarioDTO
+ScenarioListMapper --> "1..*" Scenario: scenario
+StationTypeListMapper --> "1" StationTypeDTO: stationTypeDTO
+StationTypeListMapper --> "1..*" StationType
+StationMapper --> "1..*" Station: station
+StationMapper --> "1" StationDTO: stationDTO
+
+Scenario --> "*" City: city
+Station --> "1" Position: position
+
+@enduml

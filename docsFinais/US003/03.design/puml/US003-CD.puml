@@ -1,0 +1,139 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+'skinparam linetype orto
+
+skinparam classAttributeIconSize 0
+
+'left to right direction
+
+class AddCityUI{
+}
+
+class AddCityController {
+  +AddCityController()
+  +getAvailableMapNames()
+  +getMapSizeByIndex(mapIndex)
+  +createBlocksAutomatically(CityBlockDTO)
+  +createBlocksManually(CityBlockDTO)
+  +createCity(CityDTO)
+}
+
+class Repositories {
+  -Repositories()
+  +getInstance()
+  +getMapRepository()
+  +getCityBlockRepository()
+  +getCityRepository()
+}
+
+class MapRepository {
+  +getMaps()
+}
+
+class CityBlockRepository {
+  +createCityBlock(CityBlockDTO)
+  +addCityBlock(CityBlock)
+}
+
+class CityRepository {
+  +createCity(CityDTO)
+  +addCity(City)
+}
+
+class MapListMapper {
+  +toDTO(List<Map>)
+}
+
+class CityBlockMapper {
+  +toCityBlock(CityBlockDTO)
+}
+
+class CityMapper {
+  +toCity(CityDTO)
+}
+
+class MapDTO {
+  -name: String
+  -size: int
+  -scale: int
+}
+
+class CityBlockDTO {
+  -xCoordinate: int
+  -yCoordinate: int
+  -blocks: int
+  -randomize: boolean
+}
+
+class CityDTO {
+  -name: String
+  -xCoordinate: int
+  -yCoordinate: int
+  +mapSize: int
+}
+
+class Map {
+  - size : int
+    - name : String
+    - scale : int
+    - industries : List<Industry>
+    - cities : List<City>
+  +addCity(City): void
+}
+
+class CityBlock {
+   -position: Position
+  +generateBlocks(xCoordinate, yCoordinate, blocks, randomize)
+  +createBlocks(xCoordinate, yCoordinate, blocks)
+  +checkPosition(Position)
+}
+
+class City {
+  -name: String
+  -position: Position
+  -cityBlocks: List <CityBlock>
+  +createCity(name, xCoordinate, yCoordinate, mapSize)
+  +checkPosition(position, mapSize)
+  +checkName(name)
+}
+
+class Position {
+  -xCoordinate: int
+  -yCoordinate: int
+  +createPosition(xCoordinate, yCoordinate)
+}
+
+AddCityUI --> AddCityController
+
+AddCityController ..> Repositories
+AddCityController ..> MapListMapper
+AddCityController ..> CityBlockMapper
+AddCityController ..> CityMapper
+AddCityController ..> MapRepository
+AddCityController ..> CityBlockRepository
+AddCityController ..> CityRepository
+
+Repositories -> "1" Repositories : instance
+Repositories --> "1" MapRepository: mapRepository
+Repositories --> "1" CityBlockRepository: cityBlockRepository
+Repositories --> "1" CityRepository: cityRepository
+
+MapRepository --> "*" Map: map
+MapListMapper --> "1" MapDTO: mapDTO
+MapListMapper --> "1" Map: map
+CityBlockMapper --> "1" CityBlock: cityBlock
+CityBlockMapper --> "1" CityBlockDTO: cityBlockDTO
+CityMapper --> "1" City: city
+CityMapper --> "1" CityDTO: cityDTO
+
+CityBlockRepository --> "*" CityBlock: cityBlock
+CityRepository --> "*" City: city
+
+City --> "1" Position: position
+CityBlock --> "1" Position: position
+Map --> "*" City: city
+
+@enduml

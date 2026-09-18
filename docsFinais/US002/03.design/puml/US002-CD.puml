@@ -1,0 +1,177 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+'skinparam linetype orto
+
+skinparam classAttributeIconSize 0
+
+'left to right direction
+
+class CreateIndustryUI {
+}
+
+class CreateIndustryController {
+  +CreateIndustryController()
+  +getAvailableMapNames()
+  +getMapSizeByIndex(mapIndex)
+  +getAvailableIndustryTypeNames()
+  +createIndustry(dto)
+}
+
+class Repositories {
+  -Repositories()
+  +getInstance()
+  +getMapRepository()
+  +getIndustryRepository()
+  +getIndustryTypeRepository()
+}
+
+class MapRepository {
+  +getMaps()
+}
+
+class IndustryRepository {
+  +createIndustry(dto)
+  +createIndustry(industryType, xCoordinate, yCoordinate, mapSize)
+  +addIndustry(industry)
+}
+
+class IndustryTypeRepository {
+  +getIndustryTypes()
+}
+
+class MapListMapper {
+   +toDTO(map)
+}
+
+class IndustryTypeListMapper {
+  +toDTO(industryType)
+}
+
+class IndustryMapper {
+  +toIndustry(dto):
+}
+
+class MapDTO {
+  -size: int
+  -name: String
+  -scale: int
+}
+
+class IndustryTypeDTO {
+  -importation: ResourceType
+  -exportation: ResourceType
+}
+
+class IndustryDTO {
+  -industryType: IndustryType
+  -xCoordinate: int
+  -yCoordinate: int
+  -mapSize: int
+  +getIndustryType()
+  +getXCoordinate()
+  +getYCoordinate()
+  +getMapSize()
+}
+
+class Map {
+  - size : int
+  - name : String
+  - scale : int
+  - industries : List<Industry>
+  - cities : List<City>
+  +getMap(mapIndex)
+  +addIndustry(industry)
+}
+
+class Industry {
+  -industryType: IndustryType
+  -position: Position
+  +checkPosition(position, mapSize)
+  +checkIndustryType(industryType)
+}
+
+ enum IndustryType{
+    aluminum_mill
+    auto_plant
+    bakery
+    bauxit_mine
+    cannery
+    cattle_yard
+    chemical_plant
+    cement_plant
+    coal_mine
+    coffee_farm
+    cotton_farm
+    dairy_farm
+    dairy_processor
+    electric_plant
+    fertilizer_plant
+    grain_silo
+    gravel_pit
+    iron_mine
+    landfill
+    logging_camp
+    lumber_mill
+    meat_packing_plant
+    nuclear_plant
+    oil_refinery
+    oil_well
+    paper_mill
+    produce_orchard
+    rubber_farm
+    steel_mill
+    textile_mill
+    tire_factory
+    tool_and_die_factory
+    uranium_mine
+    geocore_plant
+    distillery
+    munitions_factory
+    weapons_factory
+    port
+    --
+    -importation: ResourceType
+    -exportation: ResourceType
+  }
+
+class Position {
+  -xCoordinate: int
+  -yCoordinate: int
+  +createPosition(x, y)
+}
+
+CreateIndustryUI ..> CreateIndustryController
+
+CreateIndustryController ..> Repositories
+CreateIndustryController ..> MapListMapper
+CreateIndustryController ..> IndustryTypeRepository
+CreateIndustryController ..> MapRepository
+CreateIndustryController ..> IndustryRepository
+CreateIndustryController ..> IndustryTypeListMapper
+CreateIndustryController ..> IndustryMapper
+
+Repositories -> "1" Repositories : instance
+Repositories --> "1" MapRepository: mapRepository
+Repositories --> "1" IndustryRepository: industryRepository
+Repositories --> "1" IndustryTypeRepository: industryTypeRepository
+
+MapListMapper --> "1" MapDTO
+MapListMapper --> "1..*" Map
+
+IndustryTypeListMapper --> "1" IndustryTypeDTO
+IndustryTypeListMapper --> "1..*" IndustryType
+
+IndustryMapper --> "1..*" Industry: industry
+IndustryMapper --> "*" IndustryDTO: industryDTO
+
+Industry --> "1" Position: position
+
+IndustryTypeRepository --> "38" IndustryType: industryType
+MapRepository --> "1..*" Map: map
+
+IndustryRepository --> "*" Industry: industry
+
+@enduml

@@ -1,0 +1,113 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+'hide footbox
+
+actor "Editor" as EDITOR
+participant ":CreateMapUI" as UI
+participant ":CreateMapController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories \n :Repositories" as REPO_SINGLETON
+participant "mapRepository \n :MapRepository" as MAP_REPO
+participant ":MapMapper" as MAPPER
+participant ":MapDTO" as DTO
+participant "map \n :Map" as MAP
+
+activate EDITOR
+
+EDITOR -> UI : asks to create a map
+activate UI
+
+    UI -> CTRL** : create()
+    UI --> EDITOR : asks for a size
+deactivate UI
+
+EDITOR -> UI : types a size
+activate UI
+
+    UI --> EDITOR : asks for a name
+deactivate UI
+
+EDITOR -> UI :  types a name
+activate UI
+
+UI --> EDITOR : asks for a scale
+deactivate UI
+
+EDITOR -> UI :  types a scale
+activate UI
+
+UI -> CTRL : createMap(dto)
+activate CTRL
+
+CTRL -> REPOS : getInstance()
+activate REPOS
+
+    REPOS --> CTRL : repositories
+deactivate REPOS
+
+CTRL -> REPO_SINGLETON : getMapRepository()
+activate REPO_SINGLETON
+REPO_SINGLETON --> CTRL: mapRepository
+deactivate REPO_SINGLETON
+CTRL -> MAP_REPO: createMap(dto)
+activate MAP_REPO
+
+MAP_REPO -> MAPPER : toMap(dto)
+activate MAPPER
+
+MAPPER -> DTO: getSize()
+activate DTO
+
+DTO --> MAPPER: size
+deactivate DTO
+MAPPER -> DTO: getName()
+activate DTO
+
+DTO --> MAPPER: name
+deactivate DTO
+MAPPER -> DTO: getScale()
+activate DTO
+
+DTO --> MAPPER: scale
+deactivate DTO
+MAPPER --> MAP_REPO: size, name, scale
+deactivate MAPPER
+
+MAP_REPO -> MAP: createMap(size, name, scale);
+    activate MAP
+        MAP -> MAP : checkSize(size)
+        activate MAP
+        MAP --> MAP : valid
+        deactivate MAP
+
+        MAP -> MAP : checkName(name)
+        activate MAP
+        MAP --> MAP : valid
+        deactivate MAP
+
+        MAP -> MAP : checkScale(scale)
+                activate MAP
+                MAP --> MAP : valid
+                deactivate MAP
+
+        MAP --> MAP_REPO : map
+    deactivate MAP
+
+    MAP_REPO -> MAP_REPO : addMap(map)
+    activate MAP_REPO
+    MAP_REPO --> MAP_REPO: success
+    deactivate MAP_REPO
+    MAP_REPO --> CTRL : success
+deactivate MAP_REPO
+
+CTRL --> UI : success
+deactivate CTRL
+UI --> EDITOR : displays operation success
+deactivate UI
+deactivate EDITOR
+@enduml

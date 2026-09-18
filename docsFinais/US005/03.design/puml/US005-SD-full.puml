@@ -1,0 +1,382 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+autonumber
+
+actor "Player" as PLAYER
+participant ":BuildStationUI" as UI
+participant ":BuildStationController" as CTRL
+participant "Repositories" as REPOS
+participant "repositories \n :Repositories" as REPO_SINGLETON
+participant "scenarioRepository \n :ScenarioRepository" as SCEN_REPOS
+participant ":ScenarioListMapper" as SMAPPER
+participant ":List<Scenario>" as LIST_SCENARIO
+participant ":List<ScenarioDTO>" as SLDTO
+participant ":ScenarioDTO" as SDTO
+participant "scenario \n :Scenario" as SCENARIO
+participant "stationTypeRepository \n :StationTypeRepository" as STYPE_REPOS
+participant ":StationTypeListMapper" as STYPEMAPPER
+participant ":List<StationType>" as LIST_STYPE
+participant ":List<StationTypeDTO>" as STYPELDTO
+participant ":StationTypeDTO" as STYPEDTO
+participant "closestCity \n :City" as CITY
+participant "stationRepository \n :StationRepository" as STA_REPOS
+participant ":StationMapper" as STAMAPPER
+participant ":StationDTO" as STADTO
+participant "station \n :Station" as STATION
+participant "position \n :Position" as POS
+participant "player \n :Player" as PLR
+
+
+activate PLAYER
+
+    PLAYER -> UI : asks to build a station
+    activate UI
+
+       UI --> CTRL** : create()
+
+        UI -> CTRL : getAvailableScenarioNames()
+            activate CTRL
+
+            CTRL -> REPOS : getInstance()
+            activate REPOS
+
+            REPOS --> CTRL : repositories
+            deactivate REPOS
+
+            CTRL -> REPO_SINGLETON : getScenarioRepository()
+            activate REPO_SINGLETON
+            REPO_SINGLETON --> CTRL : scenarioRepository
+            deactivate REPO_SINGLETON
+
+            CTRL -> SCEN_REPOS : getScenarios()
+            activate SCEN_REPOS
+            SCEN_REPOS --> CTRL : scenarioList
+            deactivate SCEN_REPOS
+
+            CTRL -> SMAPPER : toDTO(scenarioList)
+            activate SMAPPER
+
+            SMAPPER --> SLDTO** : create()
+
+            loop for each scenario
+                SMAPPER -> LIST_SCENARIO : getScenario()
+                activate LIST_SCENARIO
+                LIST_SCENARIO --> SMAPPER : scenario
+                deactivate LIST_SCENARIO
+
+                SMAPPER -> SMAPPER : toDTO(scenario)
+                activate SMAPPER
+
+                SMAPPER --> SDTO** : create(map, year, locomotiveTypes, importation, exportation, changer)
+                deactivate SMAPPER
+
+                SMAPPER -> SLDTO : addScenario(scenario)
+                activate SLDTO
+                deactivate SLDTO
+            end loop
+
+            SMAPPER --> CTRL : scenarioListDTO
+            deactivate SMAPPER
+
+            CTRL -> SLDTO : getAvailableScenarioNames(scenarioListDTO)
+            activate SLDTO
+
+            SLDTO --> CTRL : scenario names
+            deactivate SLDTO
+
+            CTRL --> UI : scenario names
+            deactivate CTRL
+
+        UI --> PLAYER : shows the list of scenarios
+    deactivate UI
+
+    PLAYER -> UI : selects a scenario
+    activate UI
+
+         UI --> PLAYER :  asks for the XY coordinates
+    deactivate UI
+
+    PLAYER -> UI : types the XY coordinates
+    activate UI
+
+        UI -> CTRL : getAvailableStationTypeNames()
+
+        activate CTRL
+
+                      CTRL -> REPOS : getInstance()
+                      activate REPOS
+
+                      REPOS --> CTRL : repositories
+                      deactivate REPOS
+
+                      CTRL -> REPO_SINGLETON : getStationTypeRepository()
+                      activate REPO_SINGLETON
+                      REPO_SINGLETON --> CTRL : stationTypeRepository
+                      deactivate REPO_SINGLETON
+
+                      CTRL -> STYPE_REPOS : getStationTypes()
+                      activate STYPE_REPOS
+                      STYPE_REPOS --> CTRL : stationTypeList
+                      deactivate STYPE_REPOS
+
+                      CTRL -> STYPEMAPPER : toDTO(stationTypeList)
+                      activate STYPEMAPPER
+
+                      STYPEMAPPER --> STYPELDTO** : create()
+
+                      loop for each stationType
+                          STYPEMAPPER -> LIST_STYPE : getStationType()
+                          activate LIST_STYPE
+                          LIST_STYPE --> STYPEMAPPER : stationType
+                          deactivate LIST_STYPE
+
+                          STYPEMAPPER -> STYPEMAPPER : toDTO(stationType)
+                          activate STYPEMAPPER
+
+                          STYPEMAPPER --> STYPEDTO** : create()
+                          deactivate STYPEMAPPER
+
+                          STYPEMAPPER -> STYPELDTO : addStationType(stationTypeDTO)
+                          activate STYPELDTO
+                          deactivate STYPELDTO
+                      end loop
+
+                      STYPEMAPPER --> CTRL : stationTypeListDTO
+                      deactivate STYPEMAPPER
+
+                      CTRL -> STYPELDTO : getAvailableStationTypeNames(stationTypeListDTO)
+                      activate STYPELDTO
+
+                      STYPELDTO --> CTRL : stationType names
+                      deactivate STYPELDTO
+
+                      CTRL --> UI : stationType names
+                      deactivate CTRL
+
+    UI --> PLAYER : shows list of station types
+
+    deactivate UI
+
+    PLAYER -> UI : selects a type from the available ones
+
+    activate UI
+
+
+
+    alt chosen Station
+        UI --> PLAYER : asks for compass coordinate
+        deactivate UI
+
+        PLAYER -> UI : types compass coordinate
+        activate UI
+
+    end alt
+
+        UI -> CTRL: getRecommendedName(x, y, scenarioIndex, typeIndex)
+        activate CTRL
+
+            CTRL -> REPOS : getInstance()
+            activate REPOS
+
+            REPOS --> CTRL : repositories
+            deactivate REPOS
+
+            CTRL -> REPO_SINGLETON : getScenarioRepository()
+            activate REPO_SINGLETON
+            REPO_SINGLETON --> CTRL : scenarioRepository
+            deactivate REPO_SINGLETON
+
+            CTRL -> SCEN_REPOS : getScenarios()
+            activate SCEN_REPOS
+            SCEN_REPOS --> CTRL : scenarioList
+            deactivate SCEN_REPOS
+
+            CTRL -> LIST_SCENARIO: getScenarioByIndex(scenarioIndex)
+            activate LIST_SCENARIO
+
+            LIST_SCENARIO --> CTRL: scenario
+            deactivate LIST_SCENARIO
+
+            CTRL -> SCENARIO: getClosestCity(x, y, scenarioIndex)
+            activate SCENARIO
+
+            SCENARIO -> CITY: getName()
+            activate CITY
+
+            CITY --> SCENARIO: name
+            deactivate CITY
+
+            SCENARIO --> CTRL: name
+            deactivate SCENARIO
+
+            CTRL --> UI: name
+            deactivate CTRL
+
+        UI --> PLAYER : recommends a name based on the closest city
+        deactivate UI
+
+        alt recommended name
+            PLAYER -> UI : selects recommended name
+            activate UI
+
+            UI -> CTRL: name = proposedName
+        else typed name
+            PLAYER -> UI : types a different name
+            UI -> CTRL: name = typedName
+        deactivate CTRL
+
+       end alt
+
+    UI -> CTRL : createStation(dto)
+    activate CTRL
+
+    CTRL -> REPOS : getInstance()
+    activate REPOS
+
+        REPOS --> CTRL : repositories
+    deactivate REPOS
+
+    CTRL -> REPO_SINGLETON : getStationRepository()
+    activate REPO_SINGLETON
+    REPO_SINGLETON --> CTRL: stationRepository
+    deactivate REPO_SINGLETON
+    CTRL -> STA_REPOS: createStation(dto)
+    activate STA_REPOS
+
+    STA_REPOS -> STAMAPPER : toStation(dto)
+    activate STAMAPPER
+
+    STAMAPPER -> STADTO: getStationType()
+    activate STADTO
+
+    STADTO --> STAMAPPER: stationType
+    deactivate STADTO
+    STAMAPPER -> STADTO: getXCoordinate()
+    activate STADTO
+
+    STADTO --> STAMAPPER: xCoordinate
+    deactivate STADTO
+    STAMAPPER -> STADTO: getYCoordinate()
+        activate STADTO
+
+        STADTO --> STAMAPPER: yCoordinate
+        deactivate STADTO
+
+    STAMAPPER -> STADTO: getName()
+        activate STADTO
+
+        STADTO --> STAMAPPER: name
+        deactivate STADTO
+
+    STAMAPPER -> STADTO: getCenter()
+            activate STADTO
+
+            STADTO --> STAMAPPER: center
+            deactivate STADTO
+
+     STAMAPPER -> STADTO: getDemandedCargo()
+             activate STADTO
+
+             STADTO --> STAMAPPER: demandedCargo
+             deactivate STADTO
+
+       STAMAPPER -> STADTO: getSuppliedCargo()
+                  activate STADTO
+
+                  STADTO --> STAMAPPER: suppliedCargo
+                  deactivate STADTO
+
+     STAMAPPER -> STADTO: getScenarioIndex()
+                          activate STADTO
+
+                          STADTO --> STAMAPPER: scenarioIndex
+                          deactivate STADTO
+
+    STAMAPPER -> STADTO: getStationTypeIndex()
+                              activate STADTO
+
+                              STADTO --> STAMAPPER: stationTypeIndex
+                              deactivate STADTO
+
+    STAMAPPER -> STADTO: getMap()
+                                  activate STADTO
+
+                                  STADTO --> STAMAPPER: map
+                                  deactivate STADTO
+
+    STAMAPPER -> STADTO: getScenario()
+                                      activate STADTO
+
+                                      STADTO --> STAMAPPER: scenario
+                                      deactivate STADTO
+
+
+
+
+    STAMAPPER --> STA_REPOS: stationType, xCoordinate, yCoordinate, name, center, demandedCargo, suppliedCargo, scenarioIndex, stationTypeIndex, map, scenario
+    deactivate STAMAPPER
+
+    STA_REPOS -> STATION: createStation(stationType, xCoordinate, yCoordinate, name, center, demandedCargo, suppliedCargo, scenarioIndex, stationTypeIndex, map, scenario)
+    activate STATION
+
+    STATION --> POS**: createPosition(xCoordinate, yCoordinate)
+
+    STATION -> STATION: checkPosition(position, map)
+        activate STATION
+
+        STATION --> STATION: valid
+        deactivate STATION
+
+    STATION -> STATION: checkStationType(stationType)
+    activate STATION
+
+    STATION --> STATION: valid
+    deactivate STATION
+
+    STATION -> STATION: checkOverbuilding(position, map, scenario)
+        activate STATION
+
+        STATION --> STATION: valid
+        deactivate STATION
+    STATION -> STATION: checkCenter(center)
+    activate STATION
+
+    STATION --> STATION: valid
+    deactivate STATION
+
+    STATION --> STA_REPOS: station
+    deactivate STATION
+
+    STA_REPOS -> STA_REPOS: addStation(station)
+    activate STA_REPOS
+
+    STA_REPOS --> STA_REPOS: success
+    deactivate STA_REPOS
+
+     STA_REPOS -> SCENARIO: station
+     deactivate STA_REPOS
+
+     activate SCENARIO
+
+        SCENARIO -> SCENARIO: addStation(station)
+        activate SCENARIO
+
+        SCENARIO --> SCENARIO: success
+        deactivate SCENARIO
+
+        SCENARIO --> CTRL: success
+        deactivate SCENARIO
+
+        CTRL -> PLR: deductBudget(stationType)
+
+    CTRL --> UI: success
+    deactivate CTRL
+
+    UI --> PLAYER : displays success
+    deactivate UI
+
+deactivate PLAYER
+@enduml

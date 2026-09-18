@@ -1,0 +1,45 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+'skinparam linetype ortho
+'left to right direction
+skinparam classAttributeIconSize 0
+hide circle
+hide methods
+
+left to right direction
+
+class Player {
+    name
+    password
+    budget
+}
+
+class Station {
+    name
+    capacity
+    centre
+}
+
+class StationType{
+    radius
+    cost
+}
+
+class Position{
+    xCoordinate
+    yCoordinate
+}
+
+class Scenario {
+}
+
+Scenario "1" -- "*" Station : contains >
+Station "1" -- "1" StationType: has >
+Player "1" -- "*" Station: builds >
+Player "*" -- "1" Scenario : selects >
+Position "1" -- "1" Station: has <
+
+
+@enduml

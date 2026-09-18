@@ -1,0 +1,179 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+'skinparam linetype orto
+
+skinparam classAttributeIconSize 0
+
+'left to right direction
+
+    class CreateScenarioUI
+    class CreateScenarioController {
+        +CreateScenarioController()
+        +getAvailableMapNames()
+        +getAvailableLocomotiveTypeNames()
+        +getAvailableResourceTypeNames()
+        +createScenario(dto)
+    }
+
+    class Repositories {
+        -Repositories()
+        +getInstance()
+        + getMapRepository()
+        + getLocomotiveTypeRepository()
+        + getResourceTypeRepository()
+        + getScenarioRepository()
+    }
+
+    class MapRepository {
+        + getMaps()
+    }
+    class LocomotiveTypeRepository {
+        + getLocomotiveTypes()
+    }
+    class ResourceTypeRepository {
+        + getResourceTypes()
+    }
+    class ScenarioRepository {
+        + createScenario(dto)
+        + addScenario(scenario)
+    }
+
+    class Map {
+        - size : int
+            - name : String
+            - scale : int
+            - industries : List<Industry>
+            - cities : List<City>
+    }
+    enum LocomotiveType {
+        STEAM
+        DIESEL
+        ELECTRIC
+    }
+    enum ResourceType {
+        ALUMINUM
+        AUTOS
+        BAUXITE
+        CATTLE
+        CEMENT
+        CHEMICALS
+        COAL
+        COFFEE
+        COTTON
+        DAIRY
+        DIESEL
+        FERTILIZER
+        FOOD
+        GOODS
+        GRAIN
+        GRAVEL
+        IRON
+        LOGS
+        LUMBER
+        MAIL
+        MILK
+        OIL
+        PAPER
+        PASSENGERS
+        PRODUCE
+        PULPWOOD
+        RUBBER
+        STEEL
+        SUGAR
+        TIRES
+        URANIUM
+        WASTE
+        WOOL
+        ALCOHOL
+        AMMUNITION
+        TROOPS
+        WEAPONS
+        --
+        -cost
+    }
+    class Scenario {
+        - map: Map
+        - year: int
+        - locomotiveTypes: List<LocomotiveType>
+        - importation: List<ResourceType>
+        - exportation: List<ResourceType>
+        - changer: int
+        + checkMap(map)
+        + checkYear(year)
+        + checkLocomotiveTypes(List<LocomotiveType>)
+        + checkImportation(List<ResourceType>)
+        + checkExportation(List<ResourceType>)
+        + checkChanger(changer)
+    }
+
+    class ScenarioDTO {
+        + getMap()
+        + getYear()
+        + getLocomotiveTypes()
+        + getImportation()
+        + getExportation()
+        + getChanger()
+    }
+    class MapDTO {
+        - name: String
+        - size: int
+        - scale: int
+    }
+    class LocomotiveTypeDTO
+
+    class ResourceTypeDTO
+
+    class MapListMapper {
+        + toDTO(List<Map>)
+    }
+    class LocomotiveTypeListMapper {
+        + toDTO(List<LocomotiveType>)
+    }
+    class ResourceTypeListMapper {
+        + toDTO(List<ResourceType>)
+    }
+    class ScenarioMapper {
+        + toScenario(dto)
+    }
+
+
+    CreateScenarioUI ..> CreateScenarioController
+
+    CreateScenarioController ..> Repositories
+
+    Repositories -> "1" Repositories : instance
+    Repositories --> "1" MapRepository: mapRepository
+    Repositories --> "1" LocomotiveTypeRepository: locomotiveTypeRepository
+    Repositories --> "1" ResourceTypeRepository: resourceTypeRepository
+    Repositories --> "1" ScenarioRepository: scenarioRepository
+
+    CreateScenarioController ..> MapListMapper
+    CreateScenarioController ..> LocomotiveTypeListMapper
+    CreateScenarioController ..> ResourceTypeListMapper
+    CreateScenarioController ..> ScenarioRepository
+    CreateScenarioController ..> MapRepository
+    CreateScenarioController ..> ResourceTypeRepository
+    CreateScenarioController ..> LocomotiveTypeRepository
+
+    ScenarioRepository --> "1" ScenarioMapper: scenarioMapper
+
+    MapRepository --> "1..*" Map: map
+    LocomotiveTypeRepository --> "3" LocomotiveType: locomotiveType
+    ResourceTypeRepository --> "28" ResourceType: resourceType
+
+    ScenarioMapper --> "1" Scenario: scenario
+    ScenarioMapper --> "1" ScenarioDTO: scenarioDTO
+
+
+    Scenario --> "1" Map: map
+    Scenario --> "1..*" LocomotiveType: locomotiveType
+    Scenario --> "*" ResourceType: resourceType
+
+    MapListMapper --> "1" MapDTO: mapDTO
+    LocomotiveTypeListMapper --> "1" LocomotiveTypeDTO: locomotiveTypeDTO
+    ResourceTypeListMapper --> "1" ResourceTypeDTO: resourceTypeDTO
+
+    @enduml

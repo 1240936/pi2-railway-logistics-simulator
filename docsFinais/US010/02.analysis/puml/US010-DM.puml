@@ -1,0 +1,144 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+'skinparam linetype ortho
+'left to right direction
+skinparam classAttributeIconSize 0
+hide circle
+hide methods
+
+left to right direction
+
+class Player {
+    name
+    password
+    budget
+}
+
+class Locomotive {
+    iD
+}
+
+class LocomotiveModel{
+    power
+    acceleration
+    topSpeed
+    operationStartYear
+    fuelCost
+    maintenancePYear
+    cost
+}
+
+class LocomotiveType{
+}
+
+class Route {
+}
+
+class Station {
+    name
+    capacity
+    centre
+}
+
+class StationType{
+    radius
+    cost
+}
+
+class Cargo {
+    quantity
+}
+
+class ResourceType{
+    value
+}
+
+class Railway{
+    start
+    end
+}
+
+class RailwayType{
+    cost
+    electrification
+}
+
+class Position{
+    xCoordinate
+    yCoordinate
+}
+
+class Train {
+}
+
+class Carriage{
+}
+
+class TimeRestriction{
+    year
+}
+
+class TechnologicalRestriction{
+}
+
+class Scenario{
+}
+
+class CargoStatus{
+    supply
+    demand
+}
+
+class PointOfRoute{
+    quantity
+    mode
+}
+
+Player "*" -- "1" Scenario : selects >
+Player "1" -- "*" Station : builds >
+Player "1" -- "*" Route : creates >
+Player "1" -- "*" Railway : builds >
+Player "1" -- "*"  Cargo : selects >
+Player "1" -- "1..*" Locomotive : buys >
+
+Scenario "1" -- "*" TechnologicalRestriction: includes >
+Scenario "1" -- "*" TimeRestriction: includes >
+Scenario "1" -- "*" Station: contains >
+Scenario "1" -- "*" Route: contains >
+Scenario "1" -- "*" Locomotive: contains >
+
+TimeRestriction "1" -- "*" LocomotiveModel: affects >
+
+TechnologicalRestriction "1" -- "*" LocomotiveType: affects >
+
+Position "1" -- "1" Station: has <
+
+Station "1" -- "*" Cargo : stores >
+Station "1" -- "1" StationType: has >
+Station "1" -- "1" PointOfRoute: includes <
+
+Locomotive "*" -- "1" LocomotiveModel: has >
+LocomotiveModel "1..*" -- "1" LocomotiveType: has >
+
+Carriage "1..*" -- "*" Cargo: transports >
+
+Railway "1..*" -- "2..*" Station : connects >
+Railway "1" -- "1" RailwayType: has >
+
+Cargo "1" -- "1" ResourceType: has >
+Cargo "1" -- "1" CargoStatus: has >
+Cargo "*" -- "1" PointOfRoute: includes <
+
+Route "*" -- "1..*" Railway: requires >
+Route "1" -- "2..*" PointOfRoute: has >
+
+Train "1" -- "1" Locomotive: is part of <
+Train "1" -- "*" Carriage: is part of <
+Train "1..*" -- "*" Route : assigned to >
+Train "1..*" -- "1..*" Railway: runs on >
+
+
+
+@enduml
